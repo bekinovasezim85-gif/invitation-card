@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="ky">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Айгерим &amp; Тилек — Үйлөнүү тоюбузга чакырабыз</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ivory:#FBF7F0; --paper:#FFFFFF; --ink:#2B241E; --muted:#7A6A5C;
+    --gold:#B08D57; --gold-light:#D9C39A; --gold-dark:#8C6A3D;
+    --cream:#EADFCF; --blush:#E7CFC3;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ivory:#211C17; --paper:#2A241D; --ink:#F3EADD; --muted:#C9B9A6;
+      --gold:#D6B67F; --gold-light:#E6D2AC; --gold-dark:#B99358;
+      --cream:#332B21; --blush:#3C2E27;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ivory:#211C17; --paper:#2A241D; --ink:#F3EADD; --muted:#C9B9A6;
+    --gold:#D6B67F; --gold-light:#E6D2AC; --gold-dark:#B99358;
+    --cream:#332B21; --blush:#3C2E27;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{
+    margin:0; background:var(--ivory); color:var(--ink);
+    font-family:'Jost',sans-serif; -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(176,141,87,.07), transparent 40%),
+      radial-gradient(circle at 88% 92%, rgba(176,141,87,.06), transparent 45%);
+    background-attachment:fixed;
+  }
+  h1,h2,h3,h4{margin:0; font-weight:400;}
+  p{margin:0;}
+  .display{font-family:'Cormorant Garamond',serif;}
+  .kicker{font-size:11px; letter-spacing:.35em; color:var(--gold-dark); font-weight:500;}
+  .muted{color:var(--muted);}
+  .divider{width:64px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:20px auto;}
+  .section{padding:clamp(4rem,10vw,7rem) 1.5rem; position:relative; overflow:hidden;}
+  .section.alt{background:var(--cream);}
+  .wrap{max-width:960px; margin:0 auto;}
+  .wrap-sm{max-width:640px; margin:0 auto;}
+  .center{text-align:center;}
+  a{color:inherit;}
+  button{font-family:inherit; cursor:pointer;}
+
+  /* reveal on scroll */
+  .reveal{opacity:0; transform:translateY(26px); transition:opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1);}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  /* ---------- Envelope ---------- */
+  #envelope{
+    position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
+    background:var(--ivory); flex-direction:column; padding:24px; text-align:center;
+    transition:opacity .5s ease;
+  }
+  #envelope.hide{opacity:0; pointer-events:none;}
+  .env-names{font-size:11px; letter-spacing:.35em; color:var(--muted); margin-bottom:32px;}
+  .env-box{position:relative; width:280px; max-width:82vw; height:190px;}
+  .env-body{position:absolute; inset:0; border:1px solid rgba(176,141,87,.3); background:var(--paper); border-radius:2px;
+    box-shadow:0 20px 60px -15px rgba(176,141,87,.35); display:flex; align-items:flex-end; justify-content:center; padding:24px 20px 26px;}
+  .env-body p{font-style:italic; line-height:1.4; font-size:19px;}
+  .env-flap{position:absolute; top:0; left:0; right:0; height:0;
+    border-left:140px solid transparent; border-right:140px solid transparent; border-top:95px solid var(--cream);
+    max-width:100%; transform-origin:top center; transition:transform .8s ease; filter:drop-shadow(0 6px 10px rgba(0,0,0,.06));}
+  #envelope.opening .env-flap{transform:rotateX(165deg);}
+  .env-seal{position:absolute; left:50%; top:78px; transform:translate(-50%,-50%); width:64px; height:64px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--gold-light), var(--gold) 60%, var(--gold-dark));
+    display:flex; align-items:center; justify-content:center; color:var(--ivory); border:none; box-shadow:0 8px 20px rgba(140,106,61,.35);
+    transition:transform .2s ease;}
+  .env-seal:hover{transform:translate(-50%,-50%) scale(1.06);}
+  #envelope.opening .env-seal{opacity:0; transition:opacity .3s ease;}
+  .env-hint{margin-top:36px; font-size:12px; letter-spacing:.05em; color:var(--muted);}
+  .btn-outline{margin-top:18px; border:1px solid rgba(176,141,87,.5); background:transparent; color:var(--gold-dark);
+    padding:13px 40px; border-radius:999px; font-size:11px; letter-spacing:.35em; transition:.25s;}
+  .btn-outline:hover{background:var(--gold); color:var(--ivory); border-color:var(--gold);}
+  .heart-burst{position:absolute; inset:0; pointer-events:none;}
+  .heart-burst span{position:absolute; left:50%; top:50%; opacity:0;}
+
+  /* floating petals */
+  .petals{position:absolute; inset:0; overflow:hidden; pointer-events:none;}
+  .petal{position:absolute; top:-40px; border-radius:70% 30% 65% 35% / 60% 40% 60% 40%;
+    background:radial-gradient(circle at 35% 30%, #f3d9c9, var(--blush) 60%, var(--gold-light));
+    animation:fall linear infinite;}
+  @keyframes fall{ to{ transform:translateY(115vh) rotate(220deg); } }
+
+  /* ---------- Hero ---------- */
+  #hero{min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;}
+  #hero h1{font-size:clamp(2.6rem,8vw,4.6rem); line-height:1.08;}
+  #hero .accent{font-style:italic; color:var(--gold-dark);}
+  #hero .sub{max-width:340px; font-size:14px; line-height:1.9; margin:0 auto;}
+  #hero .date{margin-top:36px; font-size:clamp(1.4rem,4vw,2rem); letter-spacing:.2em; font-family:'Cormorant Garamond',serif;}
+  .scroll-cue{position:absolute; bottom:36px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:8px; opacity:0; animation:fadein 1s ease 1.2s forwards;}
+  .scroll-cue span:first-child{font-size:10px; letter-spacing:.3em; color:var(--muted);}
+  .scroll-line{width:1px; height:22px; background:var(--gold); animation:bob 1.8s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+  @keyframes fadein{to{opacity:1;}}
+
+  /* ---------- Story ---------- */
+  .story-grid{display:grid; gap:48px; align-items:center;}
+  @media(min-width:760px){.story-grid{grid-template-columns:1fr 1fr;}}
+  .story-art{position:relative; aspect-ratio:4/5; max-width:340px; margin:0 auto; border-radius:2px; overflow:hidden;
+    background:linear-gradient(160deg, var(--blush), var(--cream) 55%, var(--gold-light));
+    display:flex; align-items:center; justify-content:center; box-shadow:0 30px 60px -25px rgba(140,106,61,.35);}
+  .story-art svg{width:56%; opacity:.85;}
+  .story-text p{max-width:420px; font-size:15px; line-height:1.9; margin-bottom:18px; color:var(--muted);}
+
+  /* ---------- Countdown ---------- */
+  .cd-row{display:flex; justify-content:center; gap:14px; margin-top:48px; flex-wrap:wrap;}
+  .cd-item{display:flex; flex-direction:column; align-items:center;}
+  .cd-circle{width:84px; height:84px; border-radius:50%; border:1px solid rgba(176,141,87,.4); background:var(--paper);
+    display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-size:34px;}
+  .cd-item span{margin-top:10px; font-size:10px; letter-spacing:.3em; color:var(--muted);}
+
+  /* ---------- Location ---------- */
+  .map-card{border:1px solid rgba(176,141,87,.25); border-radius:3px; overflow:hidden; margin-top:36px; box-shadow:0 12px 30px -18px rgba(0,0,0,.25);}
+  .map-visual{position:relative; height:280px; background:
+     radial-gradient(circle at 30% 30%, rgba(176,141,87,.15), transparent 55%),
+     repeating-linear-gradient(0deg, rgba(176,141,87,.08) 0 1px, transparent 1px 40px),
+     repeating-linear-gradient(90deg, rgba(176,141,87,.08) 0 1px, transparent 1px 40px),
+     var(--cream);
+     display:flex; align-items:center; justify-content:center;}
+  .pin{display:flex; flex-direction:column; align-items:center; gap:8px;}
+  .pin svg{width:38px; height:38px; color:var(--gold-dark);}
+
+  /* ---------- Program ---------- */
+  .timeline{position:relative; max-width:560px; margin:56px auto 0; padding-left:38px;}
+  .timeline:before{content:""; position:absolute; left:9px; top:6px; bottom:6px; width:1px; background:rgba(176,141,87,.3);}
+  .t-item{position:relative; margin-bottom:44px;}
+  .t-item:last-child{margin-bottom:0;}
+  .t-dot{position:absolute; left:-38px; top:4px; width:14px; height:14px; border-radius:50%; border:2px solid var(--gold); background:var(--ivory);}
+  .t-row{display:flex; gap:18px; flex-wrap:wrap; align-items:baseline;}
+  .t-time{font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--gold-dark); width:60px;}
+  .t-title{font-family:'Cormorant Garamond',serif; font-size:21px;}
+  .t-desc{margin-top:4px; font-size:14px; color:var(--muted);}
+
+  /* ---------- Gallery ---------- */
+  .gal-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:44px; grid-auto-rows:150px;}
+  @media(min-width:640px){.gal-grid{grid-template-columns:repeat(3,1fr); grid-auto-rows:190px; gap:16px;}}
+  .gal-item{border-radius:2px; overflow:hidden; position:relative; cursor:pointer; border:none; padding:0;
+    display:flex; align-items:center; justify-content:center;}
+  .gal-item svg{width:44%; opacity:.8; transition:transform .5s ease;}
+  .gal-item:hover svg{transform:scale(1.08);}
+  .gal-item.tall{grid-row:span 2;}
+  .lightbox{position:fixed; inset:0; z-index:60; background:rgba(20,16,12,.95); display:flex; align-items:center; justify-content:center;
+    opacity:0; visibility:hidden; transition:opacity .35s ease; padding:20px;}
+  .lightbox.open{opacity:1; visibility:visible;}
+  .lightbox-inner{background:var(--paper); border-radius:4px; padding:40px; max-width:420px; width:100%; text-align:center;}
+  .lightbox-inner svg{width:120px; margin-bottom:20px;}
+  .lb-close{position:absolute; top:20px; right:24px; background:none; border:none; color:#fff; font-size:26px; line-height:1;}
+  .lb-nav{position:absolute; top:50%; transform:translateY(-50%); background:none; border:none; color:rgba(255,255,255,.7); font-size:30px;}
+  .lb-prev{left:16px;} .lb-next{right:16px;}
+
+  /* ---------- RSVP ---------- */
+  .glass{background:rgba(255,255,255,.55); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(176,141,87,.18); border-radius:3px; padding:40px 28px;}
+  [data-theme="dark"] .glass, @media (prefers-color-scheme: dark){.glass{background:rgba(40,34,27,.55);}}
+  .field{margin-bottom:22px; text-align:left;}
+  .field label{display:block; font-size:11px; letter-spacing:.3em; color:var(--muted); margin-bottom:8px;}
+  .field input, .field textarea{width:100%; border:none; border-bottom:1px solid rgba(176,141,87,.4); background:transparent;
+    font-family:inherit; font-size:15px; color:var(--ink); padding-bottom:8px; outline:none; transition:border-color .2s;}
+  .field input:focus, .field textarea:focus{border-color:var(--gold);}
+  .attend-row{display:flex; gap:10px;}
+  .attend-btn{flex:1; border:1px solid rgba(176,141,87,.3); background:transparent; color:var(--muted);
+    padding:11px; border-radius:999px; font-size:14px; transition:.2s;}
+  .attend-btn.active{border-color:var(--gold); background:var(--gold); color:var(--ivory);}
+  .submit-btn{width:100%; border:none; background:var(--gold); color:var(--ivory); padding:15px; border-radius:999px;
+    font-size:11px; letter-spacing:.3em; margin-top:6px; transition:.2s;}
+  .submit-btn:hover{background:var(--gold-dark);}
+  .rsvp-success{display:none; text-align:center; padding:50px 20px;}
+  .rsvp-success.show{display:block;}
+  .rsvp-form.hide{display:none;}
+  .check-circle{width:48px; height:48px; border-radius:50%; background:var(--gold); color:var(--ivory); display:flex;
+    align-items:center; justify-content:center; margin:0 auto 16px;}
+
+  /* ---------- Footer ---------- */
+  #final{min-height:60svh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;}
+  #final p.line{font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(1.4rem,4vw,1.9rem); line-height:1.4;}
+
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{outline:2px solid var(--gold); outline-offset:3px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.01ms !important; transition-duration:.01ms !important;} }
+</style>
+</head>
+<body>
+
+<!-- ============ ENVELOPE ============ -->
+<div id="envelope">
+  <div class="petals" aria-hidden="true"></div>
+  <p class="env-names">Айгерим &amp; Тилек</p>
+  <div class="env-box">
+    <div class="env-body">
+      <p class="display">Сиздерди биздин<br>үйлөнүү тоюбузга<br>чакырабыз</p>
+    </div>
+    <div class="env-flap"></div>
+    <button class="env-seal" id="sealBtn" aria-label="Ачуу">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.3C.5 8.1 2.4 4.5 6 4c2-.3 3.6.7 6 3 2.4-2.3 4-3.3 6-3 3.6.5 5.5 4.1 4 7.7C19.5 16.4 12 21 12 21z"/></svg>
+    </button>
+    <div class="heart-burst" id="heartBurst"></div>
+  </div>
+  <p class="env-hint">Чакырууңузду ачуу үчүн басыңыз</p>
+  <button class="btn-outline" id="openBtn">АЧУУ</button>
+</div>
+
+<main id="site">
+
+  <!-- ============ HERO ============ -->
+  <section id="hero" class="section">
+    <div class="petals" aria-hidden="true"></div>
+    <p class="kicker reveal">Айгерим &amp; Тилек</p>
+    <h1 class="display reveal" style="margin-top:22px;">Эки жүрөк<br><span class="accent">бир тагдыр</span></h1>
+    <div class="divider reveal"></div>
+    <p class="sub muted reveal">Биздин өзгөчө күнүбүзгө сизди да күтөбүз</p>
+    <p class="date display reveal">23 • 09 • 2026</p>
+    <div class="scroll-cue">
+      <span>ылдый жылдырыңыз</span>
+      <span class="scroll-line"></span>
+    </div>
+  </section>
+
+  <!-- ============ STORY ============ -->
+  <section id="story" class="section">
+    <div class="wrap story-grid">
+      <div class="reveal">
+        <div class="story-art">
+          <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:66%;">
+            <g stroke="#8C6A3D" stroke-width="1.1" opacity="0.9">
+              <path d="M80 90 C 70 55, 45 45, 25 60 C 42 68, 60 78, 80 90 Z"/>
+              <path d="M80 90 C 90 55, 115 45, 135 60 C 118 68, 100 78, 80 90 Z"/>
+              <path d="M80 90 C 50 98, 40 120, 55 138 C 63 122, 70 106, 80 90 Z"/>
+              <path d="M80 90 C 110 98, 120 120, 105 138 C 97 122, 90 106, 80 90 Z"/>
+              <path d="M80 90 C 60 78, 55 58, 68 40 C 76 56, 79 73, 80 90 Z" opacity="0.7"/>
+              <path d="M80 90 C 100 78, 105 58, 92 40 C 84 56, 81 73, 80 90 Z" opacity="0.7"/>
+            </g>
+            <circle cx="80" cy="90" r="4.5" fill="#B08D57"/>
+            <g stroke="#B08D57" stroke-width="0.8" opacity="0.55">
+              <path d="M25 30 q10 -6 18 2" />
+              <path d="M135 30 q-10 -6 -18 2" />
+              <path d="M25 130 q10 6 18 -2" />
+              <path d="M135 130 q-10 6 -18 -2" />
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div class="reveal story-text">
+        <p class="kicker">Биздин окуя</p>
+        <div class="divider" style="margin-left:0;"></div>
+        <p>Бир жолугушуу, миң күлкү жана эч качан унутулбас күндөр менен башталды. Ошондон бери бул жол — эки жүрөктүн бирге басып өткөн ар бир кадамы.</p>
+        <p>Бүгүн биз бул жолду мыйзамдаштырууга даярбыз жана бул кубанычтуу учурду эң жакын адамдарыбыз менен бөлүшкүбүз келет.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COUNTDOWN ============ -->
+  <section id="countdown" class="section alt center">
+    <div class="wrap-sm">
+      <p class="kicker reveal">Тойдун датасы</p>
+      <div class="divider reveal"></div>
+      <h2 class="display reveal" style="font-size:clamp(2rem,6vw,2.8rem);">23 СЕНТЯБРЬ 2026</h2>
+      <p class="muted reveal" style="margin-top:6px; font-size:14px;">Шаршемби</p>
+      <div class="cd-row reveal">
+        <div class="cd-item"><div class="cd-circle" id="cd-days">00</div><span>күн</span></div>
+        <div class="cd-item"><div class="cd-circle" id="cd-hours">00</div><span>саат</span></div>
+        <div class="cd-item"><div class="cd-circle" id="cd-mins">00</div><span>мүнөт</span></div>
+        <div class="cd-item"><div class="cd-circle" id="cd-secs">00</div><span>секунд</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LOCATION ============ -->
+  <section id="location" class="section center">
+    <div class="wrap-sm">
+      <p class="kicker reveal">Тойдун дареги</p>
+      <div class="divider reveal"></div>
+      <h3 class="display reveal" style="font-size:clamp(1.6rem,4vw,2.2rem);">Almaty Wedding Hall</h3>
+      <p class="muted reveal" style="margin-top:10px; font-size:14px;">Бишкек ш., Чүй проспекти 123</p>
+      <div class="map-card reveal">
+        <div class="map-visual">
+          <div class="pin">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s7-7.3 7-12a7 7 0 1 0-14 0c0 4.7 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            <span class="muted" style="font-size:12px;">Almaty Wedding Hall</span>
+          </div>
+        </div>
+      </div>
+      <a class="btn-outline reveal" style="display:inline-block; margin-top:28px; text-decoration:none;" href="https://maps.google.com/?q=Almaty+Wedding+Hall+Bishkek" target="_blank" rel="noopener noreferrer">КАРТАДАН КӨРҮҮ</a>
+    </div>
+  </section>
+
+  <!-- ============ PROGRAM ============ -->
+  <section id="program" class="section alt">
+    <div class="wrap-sm center">
+      <p class="kicker reveal">Тойдун программасы</p>
+      <div class="divider reveal"></div>
+    </div>
+    <div class="timeline">
+      <div class="t-item reveal">
+        <span class="t-dot"></span>
+        <div class="t-row"><span class="t-time display">16:00</span><span class="t-title display">Конокторду тосуп алуу</span></div>
+        <p class="t-desc">Кабыл алуу залында жылуу учурашуу</p>
+      </div>
+      <div class="t-item reveal">
+        <span class="t-dot"></span>
+        <div class="t-row"><span class="t-time display">17:00</span><span class="t-title display">Салтанат</span></div>
+        <p class="t-desc">Ак нике жана салтанаттуу тамаша</p>
+      </div>
+      <div class="t-item reveal">
+        <span class="t-dot"></span>
+        <div class="t-row"><span class="t-time display">18:00</span><span class="t-title display">Фотосессия</span></div>
+        <p class="t-desc">Эстелик сүрөттөр жана видео тартуу</p>
+      </div>
+      <div class="t-item reveal">
+        <span class="t-dot"></span>
+        <div class="t-row"><span class="t-time display">19:00</span><span class="t-title display">Банкет</span></div>
+        <p class="t-desc">Даамдуу тамак-аш жана куттуктоо сөздөр</p>
+      </div>
+      <div class="t-item reveal">
+        <span class="t-dot"></span>
+        <div class="t-row"><span class="t-time display">21:00</span><span class="t-title display">Көңүл ачуу</span></div>
+        <p class="t-desc">Бий, музыка жана түнкү шоу</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GALLERY ============ -->
+  <section id="gallery" class="section">
+    <div class="wrap">
+      <div class="center">
+        <p class="kicker reveal">Сүрөттөр</p>
+        <div class="divider reveal"></div>
+      </div>
+      <div class="gal-grid" id="galGrid"></div>
+    </div>
+  </section>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lb-close" id="lbClose" aria-label="Жабуу">&times;</button>
+    <button class="lb-nav lb-prev" id="lbPrev" aria-label="Мурунку">&#8249;</button>
+    <div class="lightbox-inner" id="lbInner"></div>
+    <button class="lb-nav lb-next" id="lbNext" aria-label="Кийинки">&#8250;</button>
+  </div>
+
+  <!-- ============ RSVP ============ -->
+  <section id="rsvp" class="section alt center">
+    <div class="wrap-sm">
+      <p class="kicker reveal">Сизди күтөбүз</p>
+      <div class="divider reveal"></div>
+      <p class="muted reveal" style="font-size:14px;">Ырастооңузду 10-сентябрга чейин жөнөтүңүз</p>
+
+      <div class="reveal" style="margin-top:40px;">
+        <form class="glass rsvp-form" id="rsvpForm">
+          <div class="field">
+            <label for="rname">Атыңыз</label>
+            <input id="rname" type="text" required />
+          </div>
+          <div class="field">
+            <label>Келесизби?</label>
+            <div class="attend-row">
+              <button type="button" class="attend-btn active" data-val="yes">Келем</button>
+              <button type="button" class="attend-btn" data-val="no">Келе албайм</button>
+            </div>
+          </div>
+          <div class="field" id="guestsField">
+            <label for="rguests">Коноктордун саны</label>
+            <input id="rguests" type="number" min="1" max="10" value="1" />
+          </div>
+          <div class="field">
+            <label for="rcomment">Комментарий</label>
+            <textarea id="rcomment" rows="3"></textarea>
+          </div>
+          <button type="submit" class="submit-btn">ЖӨНӨТҮҮ</button>
+        </form>
+        <div class="glass rsvp-success" id="rsvpSuccess">
+          <div class="check-circle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <p class="display" style="font-size:20px;">Рахмат! Жообуңуз кабыл алынды 💛</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FINAL ============ -->
+  <footer id="final" class="section">
+    <div class="petals" aria-hidden="true"></div>
+    <div class="reveal">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:var(--gold); margin-bottom:18px;"><path d="M12 21s-7.5-4.6-10-9.3C.5 8.1 2.4 4.5 6 4c2-.3 3.6.7 6 3 2.4-2.3 4-3.3 6-3 3.6.5 5.5 4.1 4 7.7C19.5 16.4 12 21 12 21z"/></svg>
+      <p class="line">Биздин кубанычыбызды<br>сиз менен бөлүшкүбүз келет</p>
+    </div>
+    <div class="reveal" style="margin-top:30px;">
+      <p class="kicker">Айгерим &amp; Тилек</p>
+      <p class="display" style="font-size:22px; margin-top:8px;">23 • 09 • 2026</p>
+    </div>
+    <p class="reveal muted" style="margin-top:36px; font-size:12px;">Сиздерди сүйүү менен күтөбүз</p>
+  </footer>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- petals generator ----------
+  function makePetals(container, count){
+    for(let i=0;i<count;i++){
+      const p=document.createElement('div');
+      p.className='petal';
+      const size=6+Math.random()*8;
+      p.style.width=size+'px';
+      p.style.height=(size*1.3)+'px';
+      p.style.left=(Math.random()*100)+'%';
+      p.style.opacity=(0.18+Math.random()*0.22).toFixed(2);
+      const dur=8+Math.random()*6;
+      p.style.animationDuration=dur+'s';
+      p.style.animationDelay=(-Math.random()*dur)+'s';
+      container.appendChild(p);
+    }
+  }
+  document.querySelectorAll('.petals').forEach(el=>makePetals(el,6));
+
+  // ---------- envelope open ----------
+  const envelope=document.getElementById('envelope');
+  const sealBtn=document.getElementById('sealBtn');
+  const openBtn=document.getElementById('openBtn');
+  const heartBurst=document.getElementById('heartBurst');
+  let opened=false;
+
+  function burstHearts(){
+    for(let i=0;i<10;i++){
+      const h=document.createElement('span');
+      h.innerHTML='<svg width="'+(14+(i%3)*4)+'" height="'+(14+(i%3)*4)+'" viewBox="0 0 24 24" fill="#B08D57"><path d="M12 21s-7.5-4.6-10-9.3C.5 8.1 2.4 4.5 6 4c2-.3 3.6.7 6 3 2.4-2.3 4-3.3 6-3 3.6.5 5.5 4.1 4 7.7C19.5 16.4 12 21 12 21z"/></svg>';
+      const angle=(i/10)*Math.PI*2;
+      const dist=80+(i%3)*28;
+      h.style.transition='transform 1.1s ease-out, opacity 1.1s ease-out';
+      heartBurst.appendChild(h);
+      requestAnimationFrame(()=>{
+        h.style.transform='translate('+(Math.cos(angle)*dist)+'px,'+(Math.sin(angle)*dist-30)+'px)';
+        h.style.opacity='0';
+      });
+      setTimeout(()=>h.remove(),1200);
+    }
+  }
+
+  function openEnvelope(){
+    if(opened) return;
+    opened=true;
+    envelope.classList.add('opening');
+    burstHearts();
+    setTimeout(()=>{ envelope.classList.add('hide'); document.body.style.overflow='auto'; },1100);
+    setTimeout(()=>{ envelope.style.display='none'; triggerInitialReveal(); },1700);
+  }
+  sealBtn.addEventListener('click',openEnvelope);
+  openBtn.addEventListener('click',openEnvelope);
+  document.body.style.overflow='hidden';
+
+  // ---------- scroll reveal ----------
+  const revealEls=document.querySelectorAll('.reveal');
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:0.25});
+  revealEls.forEach(el=>io.observe(el));
+
+  function triggerInitialReveal(){
+    // reveal hero immediately once envelope is gone
+    document.querySelectorAll('#hero .reveal').forEach(el=>el.classList.add('in'));
+  }
+
+  // ---------- countdown ----------
+  const target=new Date('2026-09-23T16:00:00').getTime();
+  function tick(){
+    const diff=Math.max(0,target-Date.now());
+    const d=Math.floor(diff/86400000);
+    const h=Math.floor(diff/3600000%24);
+    const m=Math.floor(diff/60000%60);
+    const s=Math.floor(diff/1000%60);
+    document.getElementById('cd-days').textContent=String(d).padStart(2,'0');
+    document.getElementById('cd-hours').textContent=String(h).padStart(2,'0');
+    document.getElementById('cd-mins').textContent=String(m).padStart(2,'0');
+    document.getElementById('cd-secs').textContent=String(s).padStart(2,'0');
+  }
+  tick(); setInterval(tick,1000);
+
+  // ---------- gallery ----------
+  const galIcons=[
+    '<circle cx="60" cy="60" r="3" fill="currentColor"/><g stroke="currentColor" stroke-width="1.3" fill="none"><path d="M60 60C54 44 42 40 33 48c9 5 18 9 27 12Z"/><path d="M60 60C66 44 78 40 87 48c-9 5-18 9-27 12Z"/><path d="M60 60C44 66 40 78 48 87c5-9 9-18 12-27Z"/><path d="M60 60C76 66 80 78 72 87c-5-9-9-18-12-27Z"/></g>',
+    '<path d="M60 30c8 12 8 24 0 30c-8-6-8-18 0-30Z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M60 60v30" stroke="currentColor" stroke-width="1.3"/><circle cx="60" cy="60" r="4" fill="currentColor"/>',
+    '<path d="M30 70c10-30 40-40 60-30-10 22-38 34-60 30Z" fill="none" stroke="currentColor" stroke-width="1.3"/>',
+    '<circle cx="45" cy="50" r="14" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="75" cy="50" r="14" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M45 64c0 14 8 22 15 26 7-4 15-12 15-26" fill="none" stroke="currentColor" stroke-width="1.2"/>',
+    '<path d="M60 25 L70 55 L100 55 L76 73 L85 100 L60 84 L35 100 L44 73 L20 55 L50 55 Z" fill="none" stroke="currentColor" stroke-width="1.1"/>',
+    '<path d="M20 60 Q60 20 100 60 Q60 100 20 60Z" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="60" cy="60" r="6" fill="currentColor"/>'
+  ];
+  const galGrid=document.getElementById('galGrid');
+  galIcons.forEach((icon,i)=>{
+    const btn=document.createElement('button');
+    btn.className='gal-item reveal'+((i===0||i===3)?' tall':'');
+    const bgs=[
+      'linear-gradient(155deg,#F3E7D8,#E7CFC3 60%,#D9C39A)',
+      'linear-gradient(155deg,#EADFCF,#D9C39A 55%,#B08D57)',
+      'linear-gradient(155deg,#F6EEE3,#EADFCF 55%,#E7CFC3)',
+      'linear-gradient(155deg,#E7CFC3,#F3E7D8 55%,#D9C39A)',
+      'linear-gradient(155deg,#D9C39A,#EADFCF 55%,#F3E7D8)',
+      'linear-gradient(155deg,#F3E7D8,#B08D57 75%)'
+    ];
+    btn.style.background=bgs[i%bgs.length];
+    btn.style.color='#8C6A3D';
+    btn.innerHTML='<svg viewBox="0 0 120 120">'+icon+'</svg>';
+    btn.addEventListener('click',()=>openLightbox(i));
+    galGrid.appendChild(btn);
+    io.observe(btn);
+  });
+
+  const lightbox=document.getElementById('lightbox');
+  const lbInner=document.getElementById('lbInner');
+  let lbIndex=0;
+  function renderLb(){
+    lbInner.style.color='#8C6A3D';
+    lbInner.innerHTML='<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">'+galIcons[lbIndex]+'</svg><p class="muted" style="font-size:13px; margin-top:6px;">Сүрөт '+(lbIndex+1)+' / '+galIcons.length+'</p>';
+  }
+  function openLightbox(i){ lbIndex=i; renderLb(); lightbox.classList.add('open'); }
+  document.getElementById('lbClose').addEventListener('click',()=>lightbox.classList.remove('open'));
+  document.getElementById('lbPrev').addEventListener('click',()=>{ lbIndex=(lbIndex-1+galIcons.length)%galIcons.length; renderLb(); });
+  document.getElementById('lbNext').addEventListener('click',()=>{ lbIndex=(lbIndex+1)%galIcons.length; renderLb(); });
+  lightbox.addEventListener('click',(e)=>{ if(e.target===lightbox) lightbox.classList.remove('open'); });
+  document.addEventListener('keydown',(e)=>{
+    if(!lightbox.classList.contains('open')) return;
+    if(e.key==='Escape') lightbox.classList.remove('open');
+    if(e.key==='ArrowRight'){ lbIndex=(lbIndex+1)%galIcons.length; renderLb(); }
+    if(e.key==='ArrowLeft'){ lbIndex=(lbIndex-1+galIcons.length)%galIcons.length; renderLb(); }
+  });
+
+  // ---------- RSVP ----------
+  let attending='yes';
+  document.querySelectorAll('.attend-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.attend-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      attending=btn.dataset.val;
+      document.getElementById('guestsField').style.display= attending==='yes' ? 'block':'none';
+    });
+  });
+  document.getElementById('rsvpForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    document.getElementById('rsvpForm').classList.add('hide');
+    document.getElementById('rsvpSuccess').classList.add('show');
+    try{
+      localStorage.setItem('rsvp_'+Date.now(), JSON.stringify({
+        name:document.getElementById('rname').value,
+        attending, guests:document.getElementById('rguests').value,
+        comment:document.getElementById('rcomment').value
+      }));
+    }catch(err){}
+  });
+
+})();
+</script>
+</body>
+</html>
